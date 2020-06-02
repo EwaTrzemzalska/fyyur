@@ -1,0 +1,2 @@
+1. createdb fyyur
+2. in config.py --> SQLALCHEMY_DATABASE_URI = 'postgres://admin@localhost:5432/fyyur'
