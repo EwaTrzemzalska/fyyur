@@ -35,10 +35,13 @@ class Venue(db.Model):
     state = db.Column(db.String(120), nullable=False)
     address = db.Column(db.String(120), nullable=False)
     phone = db.Column(db.String(120), nullable=False)
+    genres = db.Column(db.ARRAY(db.String), nullable=False)
+    website = db.Column(db.String(120), nullable=False)
     image_link = db.Column(db.String(500), nullable=False)
     facebook_link = db.Column(db.String(120), nullable=False)
     seeking_talent = db.Column(db.Boolean, nullable=False)
-    shows = db.relationship('Shows', backref='Venue', cascade="all, delete-orphan")
+    seeking_description = db.Column(db.String(500), nullable=True)
+    shows = db.relationship('Shows', backref='venue', cascade="all, delete-orphan")
 
 
 class Artist(db.Model):
@@ -48,16 +51,19 @@ class Artist(db.Model):
     city = db.Column(db.String(120), nullable=False)
     state = db.Column(db.String(120), nullable=False)
     phone = db.Column(db.String(120), nullable=False)
-    genres = db.Column(db.String(120), nullable=False)
+    genres = db.Column(db.ARRAY(db.String), nullable=False)
+    website = db.Column(db.String(120), nullable=False)
     image_link = db.Column(db.String(500), nullable=False)
     facebook_link = db.Column(db.String(120), nullable=False)
-    shows = db.relationship('Shows', backref='Artist', cascade="all, delete-orphan")
+    seeking_venues = db.Column(db.Boolean, nullable=False)
+    seeking_description = db.Column(db.String(500), nullable=True)
+    shows = db.relationship('Shows', backref='artist', cascade="all, delete-orphan")
 
 
 class Shows(db.Model):
   __tablename__ = 'shows'
   id = db.Column(db.Integer, primary_key=True)
-  artist_id = db.Column(db.Integer, db.ForeignKey('asertist.id'), nullable=False)
+  artist_id = db.Column(db.Integer, db.ForeignKey('artist.id'), nullable=False)
   venue_id = db.Column(db.Integer, db.ForeignKey('venue.id'), nullable=False)
   start_time = db.Column(db.DateTime, nullable=False)
 
@@ -73,7 +79,7 @@ def format_datetime(value, format='medium'):
       format="EEEE MMMM, d, y 'at' h:mma"
   elif format == 'medium':
       format="EE MM, dd, y h:mma"
-  return babel.dates.format_datetime(date, format)
+  return babel.dates.format_datetime(date, format, locale='en')
 
 app.jinja_env.filters['datetime'] = format_datetime
 
