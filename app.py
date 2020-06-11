@@ -5,7 +5,7 @@
 import json
 import dateutil.parser
 import babel
-from flask import Flask, render_template, request, Response, flash, redirect, url_for
+from flask import Flask, render_template, request, Response, flash, redirect, url_for, abort, jsonify
 from flask_moment import Moment
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
@@ -13,6 +13,7 @@ import logging
 from logging import Formatter, FileHandler
 from flask_wtf import Form
 from forms import *
+import sys
 #----------------------------------------------------------------------------#
 # App Config.
 #----------------------------------------------------------------------------#
@@ -234,8 +235,7 @@ def create_venue_from_request(request):
   website = request.form['website']
   image_link = request.form['image_link']
   facebook_link = request.form['facebook_link']
-  seeking_talent = request.form['seeking_talent']
-  if seeking_talent == 'y':
+  if 'seeking_talent' in request.form:
     seeking_talent = True
   else:
     seeking_talent = False
@@ -251,11 +251,19 @@ def create_venue_form():
 
 @app.route('/venues/create', methods=['POST'])
 def create_venue_submission():
-  venue = create_venue_from_request(request)
-  db.session.add(venue)
-  db.session.commit()
-
-
+  error = False
+  try:
+    venue = create_venue_from_request(request)
+    db.session.add(venue)
+    db.session.commit()
+  except:
+    error = True
+    db.session.rollback()
+    print(sys.exc_info())
+  finally:
+    db.session.close()
+  if error:
+    abort(400)
 
 
 
