@@ -224,6 +224,26 @@ def show_venue(venue_id):
 #  Create Venue
 #  ----------------------------------------------------------------
 
+def create_venue_from_request(request):
+  name = request.form['name']
+  city = request.form['city']
+  state = request.form['state']
+  address = request.form['address']
+  phone = request.form['phone']
+  genres = request.form.getlist('genres')
+  website = request.form['website']
+  image_link = request.form['image_link']
+  facebook_link = request.form['facebook_link']
+  seeking_talent = request.form['seeking_talent']
+  if seeking_talent == 'y':
+    seeking_talent = True
+  else:
+    seeking_talent = False
+  seeking_description = request.form['seeking_description']
+
+  venue = Venue(name=name, city=city, state=state, address=address, phone=phone, genres=genres, website=website, image_link=image_link, facebook_link=facebook_link, seeking_talent=seeking_talent, seeking_description=seeking_description)
+  return venue
+
 @app.route('/venues/create', methods=['GET'])
 def create_venue_form():
   form = VenueForm()
@@ -231,6 +251,14 @@ def create_venue_form():
 
 @app.route('/venues/create', methods=['POST'])
 def create_venue_submission():
+  venue = create_venue_from_request(request)
+  db.session.add(venue)
+  db.session.commit()
+
+
+
+
+
   # TODO: insert form data as a new Venue record in the db, instead
   # TODO: modify data to be the data object returned from db insertion
 
