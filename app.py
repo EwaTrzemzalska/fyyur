@@ -121,7 +121,7 @@ def venues():
             venues.append({
                 "id": venue.id,
                 "name": venue.name,
-                "num_of_shows": len(Shows.query.filter_by(id=venue.id).filter(Shows.start_time>datetime.now()).all())
+                "num_upcoming_shows": len(Shows.query.filter_by(id=venue.id).filter(Shows.start_time>datetime.now()).all())
             })
 
         data.append({
