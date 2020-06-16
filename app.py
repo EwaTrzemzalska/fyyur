@@ -28,7 +28,6 @@ migrate = Migrate(app, db)
 # Models.
 #----------------------------------------------------------------------------#
 
-
 class Venue(db.Model):
     __tablename__ = 'venue'
     id = db.Column(db.Integer, primary_key=True)
@@ -81,7 +80,6 @@ db.create_all()
 # Filters.
 #----------------------------------------------------------------------------#
 
-
 def format_datetime(value, format='medium'):
     date = dateutil.parser.parse(value)
     if format == 'full':
@@ -97,14 +95,12 @@ app.jinja_env.filters['datetime'] = format_datetime
 # Controllers.
 #----------------------------------------------------------------------------#
 
-
 @app.route('/')
 def index():
     return render_template('pages/home.html')
 
-
 #  Venues
-#  ----------------------------------------------------------------
+#----------------------------------------------------------------------------#
 
 @app.route('/venues')
 def venues():
@@ -114,6 +110,7 @@ def venues():
     all_locations = Venue.query.with_entities(
         Venue.city, Venue.state).distinct().all()
 
+    # loop for all venues in given location (tuple of city and state)
     for location in all_locations:
         original_venues = Venue.query.filter_by(city=location[0]).all()
         venues = []
@@ -151,8 +148,6 @@ def search_venues():
         "count": len(results),
         "data": data
     }
-
-    print(result)
     return render_template('pages/search_venues.html', results=response, search_term=search_term)
 
 
@@ -206,8 +201,7 @@ def show_venue(venue_id):
     return render_template('pages/show_venue.html', venue=data)
 
 #  Create Venue
-#  ----------------------------------------------------------------
-
+#----------------------------------------------------------------------------#
 
 def create_venue_from_request(request):
     name = request.form['name']
@@ -281,7 +275,7 @@ def delete_venue(venue_id):
     return jsonify(success=True)
     
 #  Artists
-#  ----------------------------------------------------------------
+#----------------------------------------------------------------------------#
 @app.route('/artists')
 def artists():
     data = []
@@ -365,7 +359,7 @@ def show_artist(artist_id):
     return render_template('pages/show_artist.html', artist=data)
 
 #  Update
-#  ----------------------------------------------------------------
+#----------------------------------------------------------------------------#
 @app.route('/artists/<int:artist_id>/edit', methods=['GET'])
 def edit_artist(artist_id):
     form = ArtistForm()
@@ -382,7 +376,6 @@ def edit_artist(artist_id):
         form.website.data = artist.website
         form.seeking_venues.data = artist.seeking_venues
         form.seeking_description.data = artist.seeking_description
-
     return render_template('forms/edit_artist.html', form=form, artist=artist)
 
 
@@ -420,7 +413,6 @@ def edit_artist_submission(artist_id):
         # on unsuccessful db insert, flash an error instead.
         flash('An error occurred. Artist ' +
               original_name + ' could not be updated.')
-
     return redirect(url_for('show_artist', artist_id=artist_id))
 
 
@@ -441,7 +433,6 @@ def edit_venue(venue_id):
         form.website.data = venue.website
         form.seeking_talent.data = venue.seeking_talent
         form.seeking_description.data = venue.seeking_description
-
     return render_template('forms/edit_venue.html', form=form, venue=venue)
 
 
@@ -483,8 +474,7 @@ def edit_venue_submission(venue_id):
     return redirect(url_for('show_venue', venue_id=venue_id))
 
 #  Create Artist
-#  ----------------------------------------------------------------
-
+#----------------------------------------------------------------------------#
 
 def create_artist_from_request(request):
     name = request.form['name']
@@ -535,8 +525,7 @@ def create_artist_submission():
     return render_template('pages/home.html')
 
 #  Shows
-#  ----------------------------------------------------------------
-
+#----------------------------------------------------------------------------#
 
 @app.route('/shows')
 def shows():
@@ -556,7 +545,7 @@ def shows():
 
 
 # Create Show
-# -----------------------------------------------------------------
+#----------------------------------------------------------------------------#
 
 def create_show_from_request(request):
     artist_id = request.form['artist_id']
@@ -595,8 +584,8 @@ def create_show_submission():
         flash('An error occurred. Show could not be listed.')
     return render_template('pages/home.html')
 
-# -----------------------------------------------------------------
-
+# Error handlers
+#----------------------------------------------------------------------------#
 
 @app.errorhandler(404)
 def not_found_error(error):
