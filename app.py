@@ -5,7 +5,7 @@
 import json
 import dateutil.parser
 import babel
-from flask import Flask, render_template, request, Response, flash, redirect, url_for
+from flask import Flask, render_template, request, Response, flash, redirect, url_for, jsonify
 from flask_moment import Moment
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
@@ -14,7 +14,7 @@ from logging import Formatter, FileHandler
 from flask_wtf import Form
 from forms import *
 import sys
-from sqlalchemy import distinct
+from sqlalchemy import distinct, delete
 #----------------------------------------------------------------------------#
 # App Config.
 #----------------------------------------------------------------------------#
@@ -260,13 +260,26 @@ def create_venue_submission():
 
 @app.route('/venues/<venue_id>', methods=['DELETE'])
 def delete_venue(venue_id):
-    # TODO: Complete this endpoint for taking a venue_id, and using
-    # SQLAlchemy ORM to delete a record. Handle cases where the session commit could fail.
-
-    # BONUS CHALLENGE: Implement a button to delete a Venue on a Venue Page, have it so that
-    # clicking that button delete it from the db then redirect the user to the homepage
-    return None
-
+    error = False
+    try:
+        venue = Venue.query.get(venue_id)
+        venue_name = venue.name
+        db.session.delete(venue)
+        db.session.commit()
+        # on successful record deletion, flash success
+        flash('Venue ' + venue_name + ' was successfully deleted!')
+    except:
+        error = True
+        db.session.rollback()
+        print(sys.exc_info())
+    finally:
+        db.session.close()
+    if error:
+        # on unsuccessful record deletion, flash an error instead.
+        flash('An error occurred. Venue ' +
+              venue_name + ' could not be deleted.')
+    return jsonify(success=True)
+    
 #  Artists
 #  ----------------------------------------------------------------
 @app.route('/artists')
@@ -375,8 +388,6 @@ def edit_artist(artist_id):
 
 @app.route('/artists/<int:artist_id>/edit', methods=['POST'])
 def edit_artist_submission(artist_id):
-    # TODO: take values from the form submitted, and update existing
-    # artist record with ID <artist_id> using the new attributes
     error = False
     artist = Artist.query.get(artist_id)
     original_name = artist.name
