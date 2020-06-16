@@ -386,7 +386,7 @@ def edit_venue(venue_id):
     form = VenueForm()
     venue = Venue.query.get(venue_id)
 
-    if venue: 
+    if venue:
         form.name.data = venue.name
         form.city.data = venue.city
         form.state.data = venue.state
@@ -398,14 +398,45 @@ def edit_venue(venue_id):
         form.website.data = venue.website
         form.seeking_talent.data = venue.seeking_talent
         form.seeking_description.data = venue.seeking_description
-        
+
     return render_template('forms/edit_venue.html', form=form, venue=venue)
 
 
 @app.route('/venues/<int:venue_id>/edit', methods=['POST'])
 def edit_venue_submission(venue_id):
-    # TODO: take values from the form submitted, and update existing
-    # venue record with ID <venue_id> using the new attributes
+    error = False
+    venue = Venue.query.get(venue_id)
+    original_name = venue.name
+
+    try:
+        venue.name = request.form['name']
+        venue.city = request.form['city']
+        venue.state = request.form['state']
+        venue.address = request.form['address']
+        venue.phone = request.form['phone']
+        venue.genres = request.form.getlist('genres')
+        venue.image_link = request.form['image_link']
+        venue.facebook_link = request.form['facebook_link']
+        venue.website = request.form['website']
+        if 'seeking_talent' in request.form:
+            venue.seeking_talent = True
+        else:
+            venue.seeking_talent = False
+        venue.seeking_description = request.form['seeking_description']
+
+        db.session.commit()
+        # on successful db insert, flash success
+        flash('Venue ' + venue.name + ' was successfully updated!')
+    except:
+        error = True
+        db.session.rollback()
+        print(sys.exc_info())
+    finally:
+        db.session.close()
+    if error:
+        # on unsuccessful db insert, flash an error instead.
+        flash('An error occurred. Venue ' +
+              original_name + ' could not be updated.')
     return redirect(url_for('show_venue', venue_id=venue_id))
 
 #  Create Artist
