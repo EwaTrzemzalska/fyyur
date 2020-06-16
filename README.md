@@ -139,5 +139,10 @@ To start and run the local development server,
   $ export FLASK_ENV=development # enables debug mode
   $ python3 app.py
   ```
+4. Create database:
+
+  ```
+  $ createdb fyyur
+  ```
 
 4. Navigate to Home page [http://localhost:5000](http://localhost:5000)
