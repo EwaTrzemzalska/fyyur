@@ -133,16 +133,16 @@ To start and run the local development server,
   $ pip install -r requirements.txt
   ```
 
-3. Run the development server:
+3. Create database:
+
+  ```
+  $ createdb fyyur
+  ```
+4. Run the development server:
   ```
   $ export FLASK_APP=myapp
   $ export FLASK_ENV=development # enables debug mode
   $ python3 app.py
   ```
-4. Create database:
 
-  ```
-  $ createdb fyyur
-  ```
-
-4. Navigate to Home page [http://localhost:5000](http://localhost:5000)
+5. Navigate to Home page [http://localhost:5000](http://localhost:5000)
